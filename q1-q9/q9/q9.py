@@ -6,4 +6,5 @@ class Solution:
         while ( x > partial_revert):
             partial_revert = int (partial_revert * 10 + x % 10)
             x = int (x / 10)
+
         return x == partial_revert or x == int (partial_revert / 10)

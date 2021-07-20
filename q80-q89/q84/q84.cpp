@@ -1,30 +1,38 @@
 class Solution {
 public:
     int largestRectangleArea(vector<int>& heights) {
-        stack<int> s;
-        int n = heights.size();
-        vector<int> ltr(n,-1);
-        vector<int> rtl(n,n);
-        int ans = 0;
-        for (int i=0;i<heights.size();i++) {
-            while (!s.empty() && heights[s.top()]>=heights[i]) 
-                s.pop();
-            if (!s.empty()) 
-                ltr[i] = s.top();
-            s.push(i);
-        }
-        while (!s.empty()) 
-            s.pop();
-        for (int i=n-1;i>=0;i--) {
-            while (!s.empty() && heights[s.top()]>=heights[i]) 
-                s.pop();
-            if (!s.empty()) 
-                rtl[i]=s.top();
-            s.push(i);
-        }
-        for(int i=0;i<n;i++) 
-            ans = max(ans,heights[i]*(rtl[i]-ltr[i]-1));
+        stack<int> index_stack;
         
-        return ans;
+        // store maximum extentable index from left side
+        int left_index[heights.size()];
+        // store maximum extentable index from right side
+        int right_index[heights.size()];
+        
+        // loop from left, find corresponding left index
+        for (int i = 0; i < heights.size(); ++i) {
+            while (!index_stack.empty() && heights[i] <= heights[index_stack.top()]) {
+                index_stack.pop();
+            }
+            left_index[i] = index_stack.empty() ? 0 : index_stack.top() + 1;
+            index_stack.push(i);
+        }
+        while(!index_stack.empty()) {
+            index_stack.pop();
+        }
+        // loop from right, find corresponding right index
+        for (int i = heights.size() - 1; i >= 0; --i) {
+            while (!index_stack.empty() && heights[i] <= heights[index_stack.top()]) {
+                index_stack.pop();
+            }
+            right_index[i] = index_stack.empty() ? heights.size() - 1 : index_stack.top() - 1;
+            index_stack.push(i);
+        }
+        // find max area = (current height * (right - left + 1))
+        int max_area = 0;
+        for (int i = 0; i < heights.size(); ++i) {
+            max_area = max(max_area, heights[i] * (right_index[i] - left_index[i] + 1));
+        }
+        return max_area;
+        
     }
 };
